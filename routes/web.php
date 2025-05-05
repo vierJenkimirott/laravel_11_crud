@@ -2,11 +2,19 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegisterController;
 
 Route::get('/', function () {
- return view('welcome');
+ return redirect()->route('login');
 });
-Route::resource('/products', ProductController::class);
+
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/staff-login', [LoginController::class, 'authenticate']);
+Route::post('/login', [LoginController::class, 'authenticate'])->name('login.authenticate');
+
+Route::get('/products', [ProductController::class, 'index'])->name('products');
+Route::resource('/products', ProductController::class);
+
+Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register.form');
+Route::post('/register', [RegisterController::class, 'register'])->name('register');

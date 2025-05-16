@@ -26,13 +26,21 @@ class ProductController extends Controller
  /**
  * Store a newly created resource in storage.
  */
- public function store(StoreProductRequest $request) : 
-RedirectResponse
- {
- Product::create($request->validated());
- return redirect()->route('products.index')
- ->withSuccess('New product is added successfully.');
- }
+public function store(StoreProductRequest $request) : RedirectResponse
+{
+    $data = $request->validated();
+
+    // Handle image upload
+    if ($request->hasFile('image')) {
+        $data['image'] = $request->file('image')->store('products', 'public');
+    }
+
+    Product::create($data);
+
+    return redirect()->route('products.index')
+        ->withSuccess('New product is added successfully.');
+}
+
  /**
  * Display the specified resource.
  */
@@ -50,13 +58,26 @@ RedirectResponse
  /**
  * Update the specified resource in storage.
  */
- public function update(UpdateProductRequest $request, Product
-$product) : RedirectResponse
- {
- $product->update($request->validated());
- return redirect()->back()
- ->withSuccess('Product is updated successfully.');
- }
+public function update(UpdateProductRequest $request, Product $product): RedirectResponse
+{
+    $data = $request->validated();
+
+    // Handle new image upload
+    if ($request->hasFile('image')) {
+        // Optional: delete old image
+        if ($product->image && \Storage::disk('public')->exists($product->image)) {
+            \Storage::disk('public')->delete($product->image);
+        }
+
+        // Store new image
+        $data['image'] = $request->file('image')->store('products', 'public');
+    }
+
+    $product->update($data);
+
+    return redirect()->back()->withSuccess('Product is updated successfully.');
+}
+
  /**
  * Remove the specified resource from storage.
  */
@@ -67,3 +88,5 @@ $product) : RedirectResponse
  ->withSuccess('Product is deleted successfully.');
  }
 }
+
+

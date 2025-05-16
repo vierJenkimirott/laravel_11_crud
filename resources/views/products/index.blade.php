@@ -21,6 +21,7 @@ Product</a>
  <th scope="col">Name</th>
  <th scope="col">Quantity</th>
  <th scope="col">Price</th>
+ <th scope="col">Image</th>
  <th scope="col">Action</th>
  </tr>
  </thead>
@@ -34,8 +35,15 @@ Product</a>
  <td>{{ $product->quantity }}</td>
  <td>{{ $product->price }}</td>
  <td>
+        @if ($product->image)
+            <img src="{{ asset('storage/' . $product->image) }}" width="60" height="60" alt="Product Image">
+        @else
+            <span class="text-muted">No Image</span>
+        @endif
+    </td>
+ <td>
  <form action="{{ 
-route('products.destroy', $product->id) }}" method="post">
+route('products.destroy', $product->id) }}" method="post" enctype="multipart/form-data">
  @csrf
 @method('DELETE')
  <a href="{{ route('products.show', 
